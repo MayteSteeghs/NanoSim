@@ -1577,9 +1577,13 @@ def simulation_gap(ref, dna_type, fastq):
 
 
 def simulation(mode, out, dna_type, per, kmer_bias, basecaller, max_l, min_l, num_threads, fastq,
-               median_l=None, sd_l=None, model_ir=False, uracil=False, polya=None, chimeric=False):
+               median_l=None, sd_l=None, model_ir=False, uracil=False, polya=None, chimeric=False, seed_seq=None):
     global total_simulated  # Keeps track of number of reads that have been simulated so far
     total_simulated = mp.Value("i", 0, lock=True)
+
+    if seed_seq is None:
+        seed_seq = np.random.SeedSequence()
+    worker_seeds = seed_seq.spawn(2 * num_threads)
 
     mp.set_start_method('fork', force=True)  # TODO: Remove this later, for testing purposes
     # Start simulation
@@ -1596,8 +1600,6 @@ def simulation(mode, out, dna_type, per, kmer_bias, basecaller, max_l, min_l, nu
     num_simulate = int(number_aligned / num_threads)
 
     for i in range(num_threads):
-        np.random.seed()
-        random.seed()
         aligned_subfile = out + "_aligned_reads{}".format(i) + ext
         error_subfile = out + "_error_profile{}".format(i)
         aligned_subfiles.append(aligned_subfile)
@@ -1608,21 +1610,21 @@ def simulation(mode, out, dna_type, per, kmer_bias, basecaller, max_l, min_l, nu
         if mode == "genome":
             p = mp.Process(target=simulation_aligned_genome,
                            args=(dna_type, min_l, max_l, median_l, sd_l, aligned_subfile, error_subfile,
-                                 kmer_bias, fastq, num_simulate, per, chimeric))
+                                 kmer_bias, fastq, num_simulate, worker_seeds[i], per, chimeric))
             procs.append(p)
             p.start()
 
         elif mode == "metagenome":
             p = mp.Process(target=simulation_aligned_metagenome,
                            args=(min_l, max_l, median_l, sd_l, aligned_subfile, error_subfile, kmer_bias,
-                                 fastq, num_simulate, per, chimeric))
+                                 fastq, num_simulate, worker_seeds[i], per, chimeric))
             procs.append(p)
             p.start()
 
         else:
             p = mp.Process(target=simulation_aligned_transcriptome,
                            args=(model_ir, aligned_subfile, error_subfile, kmer_bias, basecaller, num_simulate, polya,
-                                 fastq, per, uracil))
+                                 fastq, worker_seeds[i], per, uracil))
             procs.append(p)
             p.start()
 
@@ -1663,7 +1665,8 @@ def simulation(mode, out, dna_type, per, kmer_bias, basecaller, max_l, min_l, nu
 
             # Dividing number of unaligned reads that need to be simulated amongst the number of processes
             p = mp.Process(target=simulation_unaligned,
-                           args=(dna_type, min_l, max_l, median_l, sd_l, unaligned_subfile, fastq, num_simulate, uracil))
+                           args=(dna_type, min_l, max_l, median_l, sd_l, unaligned_subfile, fastq, num_simulate, uracil,
+                                 worker_seeds[num_threads + i]))
             procs.append(p)
             p.start()
 
