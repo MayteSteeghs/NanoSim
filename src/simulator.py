@@ -47,6 +47,11 @@ AUTHOR = "Chen Yang, Saber Hafezqorani, Ka Ming Nip, and Theodora Lo (UBC & BC C
 
 BASES = ['A', 'T', 'C', 'G']
 
+def seed_worker_rngs(seed_seq):
+    np_ss, py_ss = seed_seq.spawn(2)
+    np.random.seed(np_ss.generate_state(624, dtype=np.uint32))
+    random.seed(int.from_bytes(py_ss.generate_state(4, dtype=np.uint32).tobytes(), 'little'))
+
 
 def check_print_progress(sequence_index):
     if sequence_index % 10000 == 0:
