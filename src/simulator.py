@@ -2328,7 +2328,7 @@ def main():
         number_unaligned = number_unaligned_l[0]
         max_len = min(max_len, max_chrom)
         simulation(args.mode, out, dna_type, perfect, kmer_bias, None, max_len, min_len, num_threads, fastq, median_len,
-                   sd_len, chimeric=chimeric)
+                   sd_len, chimeric=chimeric, seed_seq=seed_seq)
 
     elif args.mode == "transcriptome":
         ref_g = args.ref_g
@@ -2422,7 +2422,7 @@ def main():
         number_unaligned = number_unaligned_l[0]
         max_len = min(max_len, max_chrom)
         simulation(args.mode, out, dna_type, perfect, kmer_bias, basecaller, max_len, min_len, num_threads,
-                   fastq, None, None, model_ir, uracil, polya)
+                   fastq, None, None, model_ir, uracil, polya, seed_seq=seed_seq)
 
     elif args.mode == "metagenome":
         genome_list = args.genome_list
@@ -2533,8 +2533,9 @@ def main():
             number_aligned = number_aligned_l[s]
             number_unaligned = number_unaligned_l[s]
             max_len = min(max_len, max(max_chrom.values()))
+            sample_seed_seq = seed_seq.spawn(1)[0]
             simulation(args.mode, out + "_" + sample, "metagenome", perfect, kmer_bias, None, max_len,
-                       min_len, num_threads, fastq, median_len, sd_len, chimeric=chimeric)
+                       min_len, num_threads, fastq, median_len, sd_len, chimeric=chimeric, seed_seq=sample_seed_seq)
 
     sys.stdout.write(strftime("%Y-%m-%d %H:%M:%S") + ": Finished!\n")
     sys.stdout.close()
