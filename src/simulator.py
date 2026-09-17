@@ -2245,8 +2245,8 @@ def main():
         sd_len = args.sd_len
         chimeric = args.chimeric
         if args.seed:
-            random.seed(int(args.seed))
-            np.random.seed(int(args.seed))
+            seed_seq = np.random.SeedSequence(args.seed)
+            seed_worker_rngs(seed_seq.spawn(1)[0])
         perfect = args.perfect
         homopolymer = args.homopolymer
         kmer_bias = args.KmerBias
@@ -2337,8 +2337,8 @@ def main():
         model_prefix = args.model_prefix
         out = args.output
         if args.seed:
-            random.seed(int(args.seed))
-            np.random.seed(int(args.seed))
+            seed_seq = np.random.SeedSequence(args.seed)
+            seed_worker_rngs(seed_seq.spawn(1)[0])
         number = [args.number]
         max_len = args.max_len
         min_len = args.min_len
@@ -2434,9 +2434,8 @@ def main():
         min_len = args.min_len
         median_len = args.median_len
         sd_len = args.sd_len
-        if args.seed:
-            random.seed(int(args.seed))
-            np.random.seed(int(args.seed))
+        seed_seq = np.random.SeedSequence(args.seed)
+        seed_worker_rngs(seed_seq.spawn(1)[0])
         perfect = args.perfect
         homopolymer = args.homopolymer
         kmer_bias = args.KmerBias
