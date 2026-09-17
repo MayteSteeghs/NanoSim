@@ -816,7 +816,8 @@ def assign_species(length_list, seg_list, current_species_base_dict):
 
 
 def simulation_aligned_metagenome(min_l, max_l, median_l, sd_l, out_reads, out_error, kmer_bias, fastq, num_simulate,
-                                  per=False, chimeric=False):
+                                  seed_seq, per=False, chimeric=False):
+    seed_worker_rngs(seed_seq)
     # Simulate aligned reads
     out_reads = open(out_reads, "w")
     out_error = open(out_error, "w")
@@ -1045,7 +1046,8 @@ def simulation_aligned_metagenome(min_l, max_l, median_l, sd_l, out_reads, out_e
 
 
 def simulation_aligned_transcriptome(model_ir, out_reads, out_error, kmer_bias, basecaller, num_simulate, polya, fastq,
-                                     per=False, uracil=False):
+                                     seed_seq, per=False, uracil=False):
+    seed_worker_rngs(seed_seq)
 
     if basecaller == "albacore":
         polya_len_dist_scale = 2.409858743694814
@@ -1268,7 +1270,8 @@ def simulation_aligned_transcriptome(model_ir, out_reads, out_error, kmer_bias, 
 
 
 def simulation_aligned_genome(dna_type, min_l, max_l, median_l, sd_l, out_reads, out_error, kmer_bias, fastq,
-                              num_simulate, per=False, chimeric=False):
+                              num_simulate, seed_seq, per=False, chimeric=False):
+    seed_worker_rngs(seed_seq)
 
     # Simulate aligned reads
     out_reads = open(out_reads, "w")
@@ -1483,7 +1486,8 @@ def get_lengths_and_ht_ratios(remaining_reads):
     return remainder_lengths,head_vs_ht_ratio_list
 
 
-def simulation_unaligned(dna_type, min_l, max_l, median_l, sd_l, out_reads, fastq, num_simulate, uracil):
+def simulation_unaligned(dna_type, min_l, max_l, median_l, sd_l, out_reads, fastq, num_simulate, uracil, seed_seq):
+    seed_worker_rngs(seed_seq)
     out_reads = open(out_reads, "w")
 
     if fastq:
